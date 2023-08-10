@@ -1,24 +1,21 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\PostResource\RelationManagers;
 
-use App\Filament\Resources\CategoryResource\Pages;
-use App\Filament\Resources\CategoryResource\RelationManagers;
-use App\Models\Category;
 use Filament\Forms;
 use Filament\Resources\Form;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 
-class CategoryResource extends Resource
+class TagsRelationManager extends RelationManager
 {
-    protected static ?string $model = Category::class;
+    protected static string $relationship = 'tags';
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
     {
@@ -47,27 +44,18 @@ class CategoryResource extends Resource
             ->filters([
                 //
             ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+                Tables\Actions\AttachAction::make(),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DetachAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
+                Tables\Actions\DetachBulkAction::make(),
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            RelationManagers\PostsRelationManager::class
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListCategories::route('/'),
-            'create' => Pages\CreateCategory::route('/create'),
-            'edit' => Pages\EditCategory::route('/{record}/edit'),
-        ];
     }
 }

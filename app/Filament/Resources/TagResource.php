@@ -58,7 +58,7 @@ class TagResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\PostsRelationManager::class
         ];
     }
 
