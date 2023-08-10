@@ -51,13 +51,17 @@ class PostResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
-                Tables\Columns\TextColumn::make('title')->limit('50')->sortable(),
+                Tables\Columns\TextColumn::make('title')->limit('50')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('slug')->limit('50'),
                 Tables\Columns\BooleanColumn::make('is_published'),
 //                Tables\Columns\SpatieMediaLibraryImageColumn::make('thumbnail')->collection('posts')
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('Published')
+                    ->query(fn(Builder $query): Builder => $query->where('is_published', true)),
+                Tables\Filters\Filter::make('UnPublished')
+                    ->query(fn(Builder $query): Builder => $query->where('is_published', false)),
+                Tables\Filters\SelectFilter::make('category')->relationship('category', 'name')
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
