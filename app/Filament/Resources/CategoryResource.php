@@ -25,10 +25,12 @@ class CategoryResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Card::make()->schema([
+
                     Forms\Components\TextInput::make('name')->reactive()
                         ->afterStateUpdated(function (\Closure $set, $state) {
                             $set('slug', Str::slug($state));
                         })->required(),
+
                     Forms\Components\TextInput::make('slug')->required()
                 ])
             ]);

@@ -6,12 +6,14 @@ use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
 
 class PostResource extends Resource
 {
@@ -23,7 +25,24 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\BelongsToSelect::make('category_id')
+                    ->relationship('category', 'name'),
+
+                Forms\Components\Card::make()->schema([
+                    Forms\Components\TextInput::make('title')->reactive()
+                        ->afterStateUpdated(function (\Closure $set, $state) {
+                            $set('slug', Str::slug($state));
+                        })->required(),
+
+                    Forms\Components\TextInput::make('slug')->required(),
+
+//                    SpatieMediaLibraryFileUpload::make('thumbnail')
+//                        ->collection('posts'),
+
+                    Forms\Components\RichEditor::make('content'),
+
+                    Forms\Components\Toggle::make('is_published')
+                ])
             ]);
     }
 
@@ -31,7 +50,11 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('id')->sortable(),
+                Tables\Columns\TextColumn::make('title')->limit('50')->sortable(),
+                Tables\Columns\TextColumn::make('slug')->limit('50'),
+                Tables\Columns\BooleanColumn::make('is_published'),
+//                Tables\Columns\SpatieMediaLibraryImageColumn::make('thumbnail')->collection('posts')
             ])
             ->filters([
                 //
@@ -43,14 +66,14 @@ class PostResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -58,5 +81,5 @@ class PostResource extends Resource
             'create' => Pages\CreatePost::route('/create'),
             'edit' => Pages\EditPost::route('/{record}/edit'),
         ];
-    }    
+    }
 }

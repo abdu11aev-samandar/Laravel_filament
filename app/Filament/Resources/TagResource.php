@@ -12,6 +12,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
 
 class TagResource extends Resource
 {
@@ -23,7 +24,15 @@ class TagResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Card::make()->schema([
+
+                    Forms\Components\TextInput::make('name')->reactive()
+                        ->afterStateUpdated(function (\Closure $set, $state) {
+                            $set('slug', Str::slug($state));
+                        })->required(),
+
+                    Forms\Components\TextInput::make('slug')->required()
+                ])
             ]);
     }
 
@@ -31,7 +40,9 @@ class TagResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('id')->sortable(),
+                Tables\Columns\TextColumn::make('name')->limit('50')->sortable(),
+                Tables\Columns\TextColumn::make('slug')->limit('50'),
             ])
             ->filters([
                 //
@@ -43,14 +54,14 @@ class TagResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -58,5 +69,5 @@ class TagResource extends Resource
             'create' => Pages\CreateTag::route('/create'),
             'edit' => Pages\EditTag::route('/{record}/edit'),
         ];
-    }    
+    }
 }
